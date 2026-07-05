@@ -6,42 +6,13 @@ public class Atm {
 
     private Scanner scanner;
     private File file = new File("Users.ser");
-    ArrayList<Account> accounts;
+    private ArrayList<Account> accounts;
+    private Account loggedInAccount;
 
-    Atm(Scanner scanner){
+    Atm(Scanner scanner, Account loggedInAccount){
         this.scanner = scanner;
+        this.loggedInAccount = loggedInAccount;
     }
-
-    public void Login(){
-
-        accounts = loadAccounts();
-        System.out.print("Enter your card number: ");
-        String cardNumber = scanner.nextLine();
-
-        System.out.print("Enter your pin: ");
-        String pin = scanner.nextLine();
-        boolean found = false;
-
-        for(Account account : accounts){
-            if(account.getCardNumber().equals(cardNumber) && account.getPin().equals(pin)){
-                System.out.println("You are logged in.");
-                found = true;
-                break;
-            }
-        }
-
-        if(!found){
-            System.out.println("It looks like you are not registered.");
-        }
-
-        else{
-
-        }
-
-    }
-
-
-
 
 
     @SuppressWarnings("unchecked")

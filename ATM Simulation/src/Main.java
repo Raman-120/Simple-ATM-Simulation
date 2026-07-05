@@ -6,6 +6,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         Atm atm = new Atm(scanner);
+        AccountAuthentication accountAuthentication = new AccountAuthentication(scanner);
 
     }
 
