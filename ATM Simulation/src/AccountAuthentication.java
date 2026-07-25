@@ -1,25 +1,51 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Random;
 
 public class AccountAuthentication implements Serializable {
 
-    ArrayList<Account> accounts;
+    public static final String ACCOUNTS_FILE = "Accounts.ser";
+
     private final Scanner scanner;
     private String cardNumber;
     private String pin;
     private double balance;
-    Account currentAccount;
-    private File file = new File("Account.ser");
-    private boolean found = false;
+    private Account currentAccount;
+    public File file = new File(ACCOUNTS_FILE);
 
     AccountAuthentication(Scanner scanner){
         this.scanner = scanner;
     }
 
+    public void createAccount(){
+        Random random = new Random();
+        ArrayList<Account> accounts = loadAccounts();
+        cardNumber = "";
+        int i = 0;
+        while(i < 4){
+            int intValue = random.nextInt(10);
+
+            cardNumber += String.valueOf(intValue);
+            i++;
+        }
+
+        System.out.println("Your atm card number is: " + cardNumber);
+
+        System.out.print("Set up your pin: ");
+        pin = scanner.nextLine();
+
+        System.out.println("You have successfully created an Atm card.");
+
+        Account newAccount =new Account(cardNumber, pin, balance);
+        accounts.add(newAccount);
+        saveAccounts(accounts);
+        System.out.println("Information saved successfully!");
+    }
+
     public void Login(){
 
-        accounts = loadAccounts();
+        ArrayList<Account> accounts = loadAccounts();
 
         System.out.print("Enter your card number: ");
         cardNumber = scanner.nextLine();
@@ -30,21 +56,24 @@ public class AccountAuthentication implements Serializable {
         for(Account account: accounts){
             if(account.getCardNumber().equals(cardNumber) && account.getPin().equals(pin)){
                 System.out.println("Login successfully.");
-                found = true;
                 currentAccount = account;
                 return;
             }
         }
-        if(!found){
-            System.out.println("Invalid credentials.");
-        }
+        currentAccount = null;
+        System.out.println("Invalid credentials.");
+
     }
 
     public Atm getAtm(){
         if(currentAccount == null){
             System.out.println("No user is logged in.");
+            return null;
         }
-        return new Atm(scanner, currentAccount);
+        else {
+            return new Atm(scanner, currentAccount);
+        }
+
     }
 
 
@@ -54,7 +83,11 @@ public class AccountAuthentication implements Serializable {
             return new ArrayList<>();
         }
         try(ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))){
-            return (ArrayList<Account>) ois.readObject();
+            Object object = ois.readObject();
+            if(object == null){
+                return new ArrayList<>();
+            }
+            return (ArrayList<Account>) object;
         }
         catch (Exception e){
             System.out.println("Unable to read the file.");
@@ -67,7 +100,7 @@ public class AccountAuthentication implements Serializable {
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))){
             oos.writeObject(accounts);
         }catch (IOException e){
-            System.out.println("Unable to write.");
+            System.out.println("Unable to write." +  e.getMessage());
         }
     }
 }

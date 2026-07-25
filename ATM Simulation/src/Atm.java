@@ -1,11 +1,14 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Atm {
+public class Atm implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Scanner scanner;
-    private File file = new File("Users.ser");
+    private final File file = new File(AccountAuthentication.ACCOUNTS_FILE);
     private ArrayList<Account> accounts;
     private Account loggedInAccount;
     private double amount;
@@ -22,11 +25,21 @@ public class Atm {
         System.out.println("4. Money Transfer");
         System.out.println("5. Change Pin");
         System.out.println("6. Transaction History");
+        System.out.println("7. Exit");
     }
 
-    public void atmSimulation(){
+    public int atmSimulation(){
+        int choice = 0;
         System.out.print("Enter your choice: ");
-        int choice = scanner.nextInt();
+        try{
+            choice = scanner.nextInt();
+
+
+        }catch (InputMismatchException e){
+            scanner.nextLine();
+            System.out.println("Please input numbers.");
+            return 0;
+        }
         scanner.nextLine();
 
         switch (choice){
@@ -38,9 +51,14 @@ public class Atm {
 
             case 4 -> MoneyTransfer();
 
-            case 5 -> pin();
+            case 5 -> Pin();
+
+            case 7 -> System.exit(0);
+
+            default -> System.out.println("Please enter between 1-7.");
 
         }
+        return choice;
     }
 
 
@@ -122,9 +140,10 @@ public class Atm {
 
     }
 
-    public String pin(){
+    public void Pin(){
         System.out.print("Enter your new pin: ");
-        return scanner.nextLine();
+        String pin = scanner.nextLine();
+        loggedInAccount.setPin(pin);
     }
 
     @SuppressWarnings("unchecked")
